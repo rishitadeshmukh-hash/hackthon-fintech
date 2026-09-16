@@ -1,0 +1,72 @@
+from urllib.parse import urlparse
+
+
+def detect_phishing_url(url):
+    score = 0
+    reasons = []
+
+    url_lower = url.lower()
+
+    # Check for HTTPS
+    if not url_lower.startswith("https://"):
+        score += 20
+        reasons.append("Website does not use HTTPS")
+
+    # Suspicious words often used in scam links
+    suspicious_words = [
+        "verify",
+        "account",
+        "login",
+        "update",
+        "kyc",
+        "bank",
+        "payment",
+        "refund",
+        "prize",
+        "winner",
+        "urgent"
+    ]
+
+    for word in suspicious_words:
+        if word in url_lower:
+            score += 10
+            reasons.append(f"Suspicious word found: {word}")
+
+    # Check for @ symbol
+    if "@" in url:
+        score += 20
+        reasons.append("URL contains @ symbol")
+
+    # Check for unusually long URL
+    if len(url) > 75:
+        score += 15
+        reasons.append("URL is unusually long")
+
+    score = min(score, 100)
+
+    if score <= 30:
+        risk = "LOW"
+    elif score <= 70:
+        risk = "MEDIUM"
+    else:
+        risk = "HIGH"
+
+    return score, risk, reasons
+
+
+print("UPI Shield - Phishing URL Detector")
+print("-----------------------------------")
+
+url = input("Enter a URL: ")
+
+score, risk, reasons = detect_phishing_url(url)
+
+print("\nRisk Score:", score, "/ 100")
+print("Risk Level:", risk)
+
+if reasons:
+    print("\nWhy?")
+    for reason in reasons:
+        print("-", reason)
+else:
+    print("\nNo suspicious patterns detected.")
